@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+				"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+				
+<mapper namespace="historyDAO">
+
+	<insert id="putHistory" parameterType="HistoryVO">
+		INSERT INTO OPER_HIST (
+		   HISTORY_ID
+		   , IP
+		   , OPER_TYPE
+		   , OPER_DESC
+		   , OPER_CREATED_DATE
+		   , EMAIL_ID
+		   ) 
+		VALUES (
+		 'GF-' || TO_CHAR(SYSDATE, 'YYYYMMDDHH24') || '-' || LPAD(HISTORY_ID_SEQ.NEXTVAL, 6, 0)
+		, #{ip}
+		, #{operationType}
+		, #{operationDescription}
+		, SYSDATE
+		, #{emailId}
+		)
+	</insert>
+
+	<resultMap type="HistoryVO" id="historyMap">
+		<id property="historyId" column="HIST_ID" />
+		<result property="ip" column="IP" />
+		<result property="operationType" column="OPER_TYPE" />
+		<result property="operationDescription" column="OPER_DESC" />
+		<result property="createdDate" column="CRT_DT" />
+		<result property="emailId" column="EMAIL_ID" />
+	</resultMap>
+	
+	
+	
+	<select id="getHistory" resultMap="historyMap">
+		SELECT 
+			HISTORY_ID
+			, IP
+			, OPER_TYPE
+			, OPER_DESC
+			, OPER_CREATED_DATE
+			, EMAIL_ID
+			FROM OPER_HIST
+	</select>
+	
+
+</mapper>
+
+
+
+
+
+
+

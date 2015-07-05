@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans	xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans 
+							http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- Bean of postService  --> 
+	<bean	id="shoppingBell.boardPost.postService"
+			class="com.ktds.high.board.post.service.impl.PostServiceImpl">
+			<property name="postBiz"	ref="shoppingBell.boardPost.postBiz"/>
+			<property name="memberBiz"	ref="shoppingBell.member.memberBiz"/>
+			<property name="historyBiz" ref="shoppingBell.history.historyBiz"/>
+	</bean>
+	
+	<!-- Bean of postBiz  -->
+	<bean	id="shoppingBell.boardPost.postBiz"
+			class="com.ktds.high.board.post.biz.impl.PostBizImpl">
+			<property name="postDAO" ref="shoppingBell.boardPost.postDAO"/>
+			
+	</bean>
+	
+	<!-- Bean of postDAO  -->
+	<bean	id="shoppingBell.boardPost.postDAO"
+			class="com.ktds.high.board.post.dao.impl.PostDAOImpl">
+			<property name="sqlSessionTemplate" ref="sqlSessionTemplate"/>
+			
+	</bean>
+	
+</beans>

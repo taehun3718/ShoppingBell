@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+				"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+				
+<mapper namespace="registDAO">
+	
+	<insert id="registUserRequest" parameterType="UserRequestVO">
+	INSERT	INTO USER_REQUEST (
+					USER_REQUEST_ID
+					, USER_EMAIL
+					, PRODUCT_NAME
+					, PRODUCT_PRICE
+					, PRODUCT_SIZE
+					, SHOP_SEARCH_URL
+					, SHOP_TYPE
+					, START_DATE
+					, DELETE_DATE
+					)
+	VALUES ( 
+					USER_REQUEST_ID_SEQ.NEXTVAL
+					, #{userEmail} 
+					, #{productName}
+					, #{productPrice}
+					, #{productSize}
+					, #{shopSearchUrl}
+					, #{shopType}
+					, SYSDATE
+					, SYSDATE + 14
+					)
+	</insert>
+	
+	<insert id="registUserRequestHistory" parameterType="UserRequestVO">
+		INSERT INTO USER_REQUEST_HISTORY (
+					USER_REQUEST_HISTORY_ID
+					, USER_EMAIL
+					, USER_GENDER
+					, USER_BIRTH
+					, PRODUCT_NAME
+					, PRODUCT_SIZE
+					, PRODUCT_PRICE
+					, SHOP_TYPE
+					, CREATED_DATE
+					) 
+		VALUES (	USER_REQUEST_HISTORY_ID_SEQ.NEXTVAL
+					, #{userEmail}
+					, #{userGender}
+					, #{userBirth}
+					, #{productName}
+					, #{productSize}
+					, #{productPrice}
+					, #{shopType}
+					, SYSDATE
+				)
+	</insert>
+	
+</mapper>

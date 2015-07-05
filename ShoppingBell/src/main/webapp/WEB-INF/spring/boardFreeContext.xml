@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	<!-- Reply 관련 -->
+	<bean	id="shoppingBell.reply.replyDAO"
+			class="com.ktds.high.board.free.dao.impl.ReplyDAOImpl">
+		<property name="sqlSessionTemplate" ref="sqlSessionTemplate" />	
+	</bean>
+	
+	<bean 	id="shoppingBell.reply.replyBiz"
+			class="com.ktds.high.board.free.biz.impl.ReplyBizImpl">
+		<property name="replyDAO" ref="shoppingBell.reply.replyDAO" />
+	</bean>
+	
+	<bean 	id="shoppingBell.reply.replyService"
+			class="com.ktds.high.board.free.service.impl.ReplyServiceImpl">
+		<property name="replyBiz" ref="shoppingBell.reply.replyBiz" />
+		<property name="loginBiz" ref="shoppingBell.login.loginBiz" />
+	</bean>
+	
+	<!-- Board 관련 -->
+	<bean id="shoppingBell.board.free.freeDAO" class="com.ktds.high.board.free.dao.impl.FreeDAOImpl">
+		<property name="sqlSessionTemplate" ref="sqlSessionTemplate" />
+	</bean>
+
+
+	<bean id="shoppingBell.board.free.freeBiz" class="com.ktds.high.board.free.biz.impl.FreeBizImpl">
+		<property name="freeDAO" ref="shoppingBell.board.free.freeDAO" />
+	</bean> 
+	
+	<bean id="shoppingBell.board.freefreeService" class="com.ktds.high.board.free.service.impl.FreeServiceImpl">
+		 <property name="freeBiz" ref="shoppingBell.board.free.freeBiz" /> 
+		 <property name="replyBiz" ref="shoppingBell.reply.replyBiz" />
+	</bean>
+</beans>

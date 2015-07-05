@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+				"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+				
+<mapper namespace="loginDAO">
+	
+	<resultMap type="UsersVO" id="loginMap">
+		<id property="emailId" column="EMAIL_ID"/>
+		<result property="password" column="PASSWORD"/>
+		<result property="nickname" column="NICKNAME"/>
+		<result property="point" column="POINT"/>
+		<result property="salt" column="SALT"/>
+		<result property="createdDate" column="CREATED_DATE"/>
+		<result property="modifiedDate" column="MODIFIED_DATE"/>
+		<result property="deleteFlag" column="DELETE_FLAG"/>
+		<result property="blockFlag" column="BLOCK_FLAG"/>
+		<result property="isAdminYN" column="IS_ADMIN_YN"/>
+		<result property="birth" column="BIRTH"/>
+		<result property="gender" column="GENDER"/>
+	</resultMap>
+	
+	<select	id="login"
+			parameterType="UsersVO"
+			resultMap="loginMap">
+		SELECT 
+				EMAIL_ID
+				, PASSWORD
+				, NICKNAME
+				, POINT
+				, SALT
+				, CREATED_DATE
+				, MODIFIED_DATE
+				, DELETE_FLAG
+				, BLOCK_FLAG 
+				, IS_ADMIN_YN
+				, BIRTH
+				, GENDER
+		FROM	MEMBER
+		WHERE	EMAIL_ID = #{emailId}
+		AND		PASSWORD = #{password}
+		AND		DELETE_FLAG = 'N'
+		AND		BLOCK_FLAG = 'N'
+	</select>
+	
+	<select id="getSaltByUserId" 
+            parameterType="string" 
+            resultType="string">
+        SELECT	SALT
+        FROM    MEMBER
+        WHERE   EMAIL_ID = #{emailId}
+        AND		DELETE_FLAG = 'N'
+		AND		BLOCK_FLAG = 'N'
+    </select>
+</mapper>
+
+
+
+
+
+
+

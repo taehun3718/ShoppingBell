@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="HistoryController" class="com.ktds.high.history.web.HistoryController">
+		<property name="historyService" ref="shoppingBell.history.historyService" />
+	</bean>
+
+	<bean id="FreeController" class="com.ktds.high.board.free.web.FreeController">
+		<property name="freeService" ref="shoppingBell.board.freefreeService" />
+	</bean>
+
+	<bean   id="FreeReplyController" class="com.ktds.high.board.free.web.ReplyController">
+		<property name="replyService" ref="shoppingBell.reply.replyService" />
+	</bean>
+
+	<bean id="HotdealController" class="com.ktds.high.board.hotdeal.web.HotdealController">
+		<property name="hotdealService" ref="shoppingBell.board.hotdealService" />
+	</bean>
+
+	<bean id="PostController" class="com.ktds.high.board.post.web.PostController">
+		<property name="postService" ref="shoppingBell.boardPost.postService" />
+	</bean>
+
+	<bean id="LoginController" class="com.ktds.high.login.web.LoginController">
+		<property name="loginService" ref="shoppingBell.login.loginService" />
+	</bean>
+
+	<bean id="MemberController" class="com.ktds.high.member.web.MemberController">
+		<property name="memberService" ref="shoppingBell.member.memberService" />
+	</bean>
+
+	<bean id="RegistController" class="com.ktds.high.regist.web.RegistController">
+		<property name="registService" ref="shoppingBell.regist.registService" />
+	</bean>
+
+	<bean id="MainController" class="com.ktds.high.main.web.MainController">
+		<property name="mainService" ref="shoppingBell.main.mainService" />
+	</bean>
+
+</beans>

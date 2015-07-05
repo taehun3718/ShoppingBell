@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+				"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+				
+<mapper namespace="memberDAO">
+
+	<insert id="regist"
+			parameterType="UsersVO">
+			
+		INSERT INTO	MEMBER 
+							(
+				   				EMAIL_ID
+				   				, PASSWORD
+				   				, NICKNAME 
+				   				, SALT
+				   				, CREATED_DATE
+				   				, MODIFIED_DATE
+				   				, BIRTH
+				   				, GENDER
+				   			) 
+			 VALUES 		
+							( 
+								#{emailId}
+								, #{password}
+								, #{nickname}
+								, #{salt}
+								, SYSDATE 
+								, SYSDATE
+								, #{birth}
+								, #{gender}
+							)
+	</insert>
+	
+	<select id="checkDuplicateUserID"
+			parameterType="string"
+			resultType="_int">
+		SELECT	COUNT(1)
+		FROM	MEMBER
+		WHERE	EMAIL_ID = #{emailId}	
+	</select>
+	
+	<update id="modify"
+			parameterType="UsersVO">
+		UPDATE	MEMBER
+		SET    
+				<if test="password != null">
+		      		PASSWORD  = #{password},
+		      	</if>
+		      	<if test="nickname != null">
+		      		NICKNAME  = #{nickname},
+		      	</if>
+		      	<if test="deleteFlag != null">
+			 		DELETE_FLAG = #{deleteFlag},				
+				</if>
+				<if test="salt != null">
+			 		SALT = #{salt},				
+				</if>
+			    MODIFIED_DATE = SYSDATE
+		WHERE	EMAIL_ID      = #{emailId}
+	</update>
+	
+	<select id="lostPassword"
+			parameterType="string"
+			resultType="_int">
+		SELECT	COUNT(1)
+		FROM	MEMBER
+		WHERE	EMAIL_ID = #{emailId}	
+	</select>
+	
+	<select id="updateTemporaryPassword"
+			parameterType="usersVO">
+		UPDATE	MEMBER
+		SET    
+		      	PASSWORD	= #{password}
+		      	, SALT		= #{salt}
+		WHERE	EMAIL_ID	= #{emailId}	
+	</select>
+
+	<resultMap type="UserRequestVO" id="myAlarmListMap">
+		<id	property="userRequestId" column="USER_REQUEST_ID"/>
+		<result property="productName" column="PRODUCT_NAME"/>
+		<result property="productPrice" column="PRODUCT_PRICE"/>
+		<result property="productSize" column="PRODUCT_SIZE"/>
+		<result property="shopType" column="SHOP_TYPE"/>
+		<result property="startDate" column="START_DATE"/>
+	</resultMap>
+	
+	<select id="myAlarmList"
+			parameterType="string"
+			resultMap="myAlarmListMap">
+		SELECT 
+				USER_REQUEST_ID
+				, PRODUCT_NAME
+				, PRODUCT_PRICE
+				, PRODUCT_SIZE
+   				, SHOP_TYPE
+   				, START_DATE
+		FROM	USER_REQUEST
+		WHERE	USER_EMAIL = #{emailId}
+	</select>
+	
+	<delete id="myAlarmDelete"
+			parameterType="string">
+		DELETE FROM	USER_REQUEST
+		WHERE		USER_REQUEST_ID = #{selectedAlarm}	
+	</delete>
+	
+	<update id="plusPoint"
+			parameterType="usersVO">
+		UPDATE MEMBER
+		SET    POINT = POINT + #{point}
+		WHERE  EMAIL_ID      = #{emailId}
+	</update>
+	
+	<update id="minusPoint"
+			parameterType="usersVO">
+		UPDATE MEMBER
+		SET    POINT = POINT - #{point}
+		WHERE  EMAIL_ID      = #{emailId}
+	</update>
+</mapper>
+
+
+
+
+
+
+

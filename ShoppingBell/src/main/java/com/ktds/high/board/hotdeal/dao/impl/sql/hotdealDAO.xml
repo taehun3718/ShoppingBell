@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+				"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+				
+<mapper namespace="hotdealDAO">
+
+	<insert id="write" parameterType="HotdealVO">
+		INSERT INTO HOTDEAL_BOARD (
+									HOTDEAL_BOARD_ID
+									, HOTDEAL_SUBJECT
+									, HOTDEAL_CONTENT
+									, HOTDEAL_CREATED_DATE
+									, HOTDEAL_MODIFIED_DATE
+									, HOTDEAL_REAL_NAME
+									, HOTDEAL_RANDOM_NAME
+									, EMAIL_ID
+									) 
+		VALUES (
+					'HD-' || TO_CHAR(SYSDATE, 'YYYYMMDDHH24') || '-' || LPAD(HOTDEAL_ID_SEQ.NEXTVAL, 6, 0)
+					, #{hotdealSubject}
+					, #{hotdealContent}
+					, SYSDATE
+					, SYSDATE
+					, #{hotdealRealName}
+					, #{hotdealRandomName}
+					, 'admin'
+				)
+	</insert>
+
+	<resultMap type="HotdealVO" id="hotdealMap">
+		<id property="hotdealBoardId" column="HOTDEAL_BOARD_ID"/>
+		<result property="hotdealSubject" column="HOTDEAL_SUBJECT"/>
+		<result property="hotdealContent" column="HOTDEAL_CONTENT"/>
+		<result property="hotdealcreatedDate" column="HOTDEAL_CREATED_DATE"/>
+		<result property="hotdealModifiedDate" column="HOTDEAL_MODIFIED_DATE"/>
+		<result property="hotdealRealName" column="HOTDEAL_REAL_NAME"/>
+		<result property="hotdealRandomName" column="HOTDEAL_RANDOM_NAME"/>
+		<result property="emailId" column="EMAIL_ID"/>
+		<result property="hotdealDelFlag" column="HOTDEAL_DEL_FLAG"/>
+		<result property="hotdealCategory" column="CATEGORY"/>
+	</resultMap>
+
+	<select id="hotdealList" resultMap="hotdealMap">
+		SELECT 
+				HOTDEAL_BOARD_ID
+				, HOTDEAL_SUBJECT
+				, HOTDEAL_CONTENT
+				, HOTDEAL_CREATED_DATE
+				, HOTDEAL_MODIFIED_DATE
+				, HOTDEAL_REAL_NAME
+				, HOTDEAL_RANDOM_NAME
+				, EMAIL_ID
+				, HOTDEAL_DEL_FLAG
+				, CATEGORY
+		FROM	HOTDEAL_BOARD
+		WHERE	HOTDEAL_DEL_FLAG = 'N'
+		ORDER	BY	HOTDEAL_BOARD_ID DESC
+	</select>
+
+	<select id="hotdealDetail" parameterType="string" resultMap="hotdealMap">
+		SELECT 
+				HOTDEAL_BOARD_ID
+				, HOTDEAL_SUBJECT
+				, HOTDEAL_CONTENT
+				, HOTDEAL_CREATED_DATE
+				, HOTDEAL_MODIFIED_DATE
+				, HOTDEAL_REAL_NAME
+				, HOTDEAL_RANDOM_NAME
+				, EMAIL_ID
+				, HOTDEAL_DEL_FLAG
+		FROM	HOTDEAL_BOARD
+		WHERE	HOTDEAL_BOARD_ID = #{hotdealBoardId}
+	</select>
+
+	<update id="hotdealDelete" parameterType="string">
+		UPDATE	HOTDEAL_BOARD
+		SET		HOTDEAL_DEL_FLAG = 'Y'
+		WHERE	HOTDEAL_BOARD_ID = #{hotdealBoardId}
+	</update>
+
+	<update id="hotdealDoUpdate" parameterType="map">
+		UPDATE	HOTDEAL_BOARD
+		<set>
+			<if test="hotdealSubject != null">HOTDEAL_SUBJECT = #{hotdealSubject},</if>
+			<if test="hotdealContent != null">HOTDEAL_CONTENT = #{hotdealContent},</if>
+			<if test="hotdealRealName != null">HOTDEAL_REAL_NAME = #{hotdealRealName},</if>
+			<if test="hotdealRandomName != null">HOTDEAL_RANDOM_NAME = #{hotdealRandomName},</if>
+		</set>
+		WHERE	HOTDEAL_BOARD_ID = #{hotdealBoardId}
+	</update>
+
+</mapper>

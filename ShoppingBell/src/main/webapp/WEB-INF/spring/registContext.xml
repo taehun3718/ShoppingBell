@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="shoppingBell.regist.registDAO" class="com.ktds.high.regist.dao.impl.RegistDAOImpl">
+		<property name="sqlSessionTemplate" ref="sqlSessionTemplate" />
+	</bean>
+	
+	<bean id="shoppingBell.regist.registBiz" class="com.ktds.high.regist.biz.impl.RegistBizImpl">
+		<property name="registDAO" ref="shoppingBell.regist.registDAO" />
+	</bean>
+	
+	<bean id="shoppingBell.regist.registService" class="com.ktds.high.regist.service.impl.RegistServiceImpl">
+		<property name="registBiz" ref="shoppingBell.regist.registBiz" />
+		<property name="memberBiz" ref="shoppingBell.member.memberBiz" />
+		<property name="historyBiz" ref="shoppingBell.history.historyBiz" />
+	</bean>
+	
+</beans>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+         "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+
+	 <typeAliases>
+		<typeAlias type="com.ktds.high.board.free.vo.FreeVO" alias="FreeVO" />
+		<typeAlias type="com.ktds.high.board.free.vo.FreeReplyVO" alias="FreeReplyVO" />
+		<typeAlias type="com.ktds.high.board.free.vo.FreeSearchVO" alias="FreeSearchVO" />
+		<typeAlias type="com.ktds.high.board.hotdeal.vo.HotdealVO" alias="HotdealVO" />
+		<typeAlias type="com.ktds.high.board.post.vo.PostVO" alias="PostVO" />
+		<typeAlias type="com.ktds.high.board.post.vo.PostSearchVO" alias="PostSearchVO" />
+		<typeAlias type="com.ktds.high.board.post.vo.PostReplyVO" alias="PostReplyVO"/>
+		<typeAlias type="com.ktds.high.board.post.vo.LikeVO" alias="LikeVO"/>
+		<typeAlias type="com.ktds.high.login.vo.UsersVO" alias="UsersVO" />
+		<typeAlias type="com.ktds.high.history.vo.HistoryVO" alias="HistoryVO" />
+		<typeAlias type="com.ktds.high.regist.vo.UserRequestVO" alias="UserRequestVO"/>
+	</typeAliases>
+
+	<mappers>
+		<mapper resource="/com/ktds/high/board/free/dao/impl/sql/freeDAO.xml" />
+		<mapper resource="/com/ktds/high/board/free/dao/impl/sql/replyDAO.xml" />
+		<mapper resource="/com/ktds/high/board/hotdeal/dao/impl/sql/hotdealDAO.xml" />
+		<mapper resource="/com/ktds/high/board/post/dao/impl/sql/postDAO.xml" />
+		<mapper resource="/com/ktds/high/login/dao/impl/sql/loginDAO.xml" />
+		<mapper resource="/com/ktds/high/member/dao/impl/sql/memberDAO.xml" />
+		<mapper resource="/com/ktds/high/history/dao/impl/sql/historyDAO.xml" />
+		<mapper resource="/com/ktds/high/regist/dao/impl/sql/registDAO.xml" />
+	</mappers>
+
+</configuration>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<decorators defaultdir="/WEB-INF/view">
+
+	<decorator name="main" title="SHOPPING BELL" page="main/main.jsp">
+		<pattern>/index</pattern>
+	</decorator>
+	
+	<decorator name="content" title="SHOPPING BELL" page="main/content.jsp">
+		<pattern>/member/*</pattern>
+		<pattern>/hotdeal/*</pattern>
+		<pattern>/post/*</pattern>
+		<pattern>/board/free/*</pattern>
+		<pattern>/member/regist</pattern>
+		<pattern>/login</pattern>
+	</decorator>
+
+</decorators>

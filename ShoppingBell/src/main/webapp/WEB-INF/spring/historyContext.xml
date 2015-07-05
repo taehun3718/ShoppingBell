@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="shoppingBell.history.historyDAO" class="com.ktds.high.history.dao.impl.HistoryDAOImpl">
+		<property name="sqlSessionTemplate" ref="sqlSessionTemplate" />
+	</bean>
+
+	<bean id="shoppingBell.history.historyBiz" class="com.ktds.high.history.biz.impl.HistoryBizImpl">
+		<property name="historyDAO" ref="shoppingBell.history.historyDAO" />
+	</bean> 
+
+	<bean id="shoppingBell.history.historyService" class="com.ktds.high.history.service.impl.HistoryServiceImpl">
+		<property name="historyBiz" ref="shoppingBell.history.historyBiz" />
+	</bean> 
+
+</beans>

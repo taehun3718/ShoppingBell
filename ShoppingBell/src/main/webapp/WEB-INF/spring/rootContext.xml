@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.1.xsd">
+
+	<!-- 
+		C3P0를 이용한 Connection Pool 생성
+		Connection Class : com.mchange.v2.c3p0.ComboPooledDataSource
+		Driver Class : net.sf.log4jdbc.DriverSpy
+	-->
+	<bean 	id="dataSource"
+			class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="net.sf.log4jdbc.DriverSpy" />
+<!-- 		<property name="jdbcUrl" value="jdbc:log4jdbc:oracle:thin:@localhost:1521:XE" /> -->
+		<property name="jdbcUrl" value="jdbc:log4jdbc:oracle:thin:@192.168.0.8:1521:XE" />
+		<property name="user" value="HIGHFIVE" />
+		<property name="password" value="1234" />
+	</bean>
+	
+	<!--
+		MyBatis SqlSessionFactory 생성
+		class : org.mybatis.spring.SqlSessionFactoryBean
+		PreparedStatement 를 생성하기 위해서 Connection 이 필요한데,
+		이 것을 DataSource에서 가져올 수 있다.
+	-->
+	<bean 	id="sqlSessionFactory"
+			class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:/mybatis.xml" />
+	</bean>
+	
+	<!--
+		SqlSessionTemplate 생성
+		class : org.mybatis.spring.SqlSessionTemplate
+		일종의 ResultSet을 대체한다.
+		여러가지 쿼리들을 수행하기 위해서
+		템플릿을 제공하는데, SELECT, INSERT, UPDATE, DELETE 등의
+		템플릿이 있다.
+	-->
+	<bean	id="sqlSessionTemplate"
+			class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactory" />
+	</bean>
+	
+	<!-- 
+		Spring 에서 DataSource에 트랜잭션 설정을 할 수 있도록 지원해준다.
+	 -->
+	<bean id="transactionManager"
+			class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<!-- 
+		트랜잭션이 실행될 메소드 타입을 설정한다.
+		이 때, transactionManager 를 사용해서 설정한다.
+	 -->
+	 <tx:advice id="txAdvice" transaction-manager="transactionManager"> 
+		<!-- 
+			트랜잭션이 실행될 메소드들...
+			RollBack 이 되는 조건을 정의한다.
+			RuntimeException이 발생했을 때만 롤백해준다. 
+		-->
+		 <tx:attributes>
+			<tx:method name="set*" rollback-for="RuntimeException"/>
+			<tx:method name="add*" rollback-for="RuntimeException"/>
+			<tx:method name="insert*" rollback-for="RuntimeException"/>
+			<tx:method name="write*" rollback-for="RuntimeException"/>
+			<tx:method name="append*" rollback-for="RuntimeException"/>
+			
+			<tx:method name="update*" rollback-for="RuntimeException"/>
+			<tx:method name="modify*" rollback-for="RuntimeException"/>
+			<tx:method name="put*" rollback-for="RuntimeException"/>
+			<tx:method name="change*" rollback-for="RuntimeException"/>
+			
+			<tx:method name="delete*" rollback-for="RuntimeException"/>
+			<tx:method name="drop*" rollback-for="RuntimeException"/>
+			<tx:method name="remove*" rollback-for="RuntimeException"/>
+		</tx:attributes>
+	</tx:advice>
+	
+	<aop:config> 
+		<!-- 
+			트랜잭션을 어디에서 걸 것인지 정의한다.
+			com.ktds 아래의 service 라는 패키지 중 
+			모든 클래스의 메소드들을 대상으로
+			트랜잭션을 걸겠다고 정의함.
+		-->
+	 	<aop:pointcut expression="execution(public * com.ktds..*service.*(..))" id="servicePublicMethod"/> 
+		<!-- 
+			aop:around 와 같은 속성으로..
+			<tx:advice id="txAdvice" 여기에 정의된
+			메소드들을 대상으로 트랜잭션을 걸겠다고 정의함.
+		 -->
+	 	<aop:advisor advice-ref="txAdvice" pointcut-ref="servicePublicMethod"/>
+	</aop:config>
+	
+</beans>

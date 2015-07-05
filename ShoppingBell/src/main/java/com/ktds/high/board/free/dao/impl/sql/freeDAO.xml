@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+				"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+				
+<mapper namespace="freeDAO">
+	<insert id="writeArticle" parameterType="FreeVO">
+		INSERT INTO FREE_BOARD (
+   					FREE_ID
+   					, EMAIL_ID 
+   					, FREE_SUBJECT
+   					, FREE_CONTENT
+   				 	, FREE_REAL_NAME
+   					, FREE_RANDOM_NAME 
+   					, FREE_CREATED_DATE
+   					, FREE_MODIFIED_DATE
+   					, FREE_HIT
+   					, FREE_BLOCK_FLAG 
+   					, FREE_DEL_FLAG 
+   					, FREE_PRODUCT_TYPE
+   					, FREE_PRICE
+   					, FREE_PRODUCT_NAME
+   					, FREE_SIZE
+   					, FREE_ETC
+   					, FREE_ONSALE
+   					) 
+		VALUES ( 
+					'FR-' || TO_CHAR(SYSDATE, 'YYYYMMDDHH24') || '-' || LPAD(FREE_ID_SEQ.NEXTVAL, 6, 0)
+					, #{emailId}
+					, #{subject}
+					, #{content}
+					, #{realName}
+					, #{randomName}
+					, SYSDATE
+					, SYSDATE
+					, '0'
+					, 'N'
+					, 'N'
+					, #{productType}
+					, #{productPrice}
+					, #{productName}
+					, #{size}
+					, #{etc}
+					, '판매중'
+				)
+	</insert>
+	
+	<resultMap type="FreeVO" id="freeMap">
+		<id 	property="freeId"		    column="FREE_ID"/>
+		<result property="emailId"			column="EMAIL_ID"/>
+		<result property="subject"			column="FREE_SUBJECT"/>
+		<result property="content"			column="FREE_CONTENT"/>
+		<result property="realName"			column="FREE_REAL_NAME"/>
+		<result property="randomName"		column="FREE_RANDOM_NAME"/>
+		<result property="createdDate"		column="FREE_CREATED_DATE"/>
+		<result property="modifiedDate"		column="FREE_MODIFIED_DATE"/>
+		<result property="hit"			    column="FREE_HIT"/>
+		<result property="freeBlockFlag"	column="FREE_BLOCK_FLAG"/>
+		<result property="freeDeleteFlag"	column="FREE_DEL_FLAG"/>
+		<result property="productType"		column="FREE_PRODUCT_TYPE"/>
+		<result property="productPrice"		column="FREE_PRICE"/>
+		<result property="productName"		column="FREE_PRODUCT_NAME"/>
+		<result property="size"				column="FREE_SIZE"/>
+		<result property="etc"				column="FREE_ETC"/>
+		<result property="onSale"			column="FREE_ONSALE"/>
+		<result property="nickName"			column="NICKNAME"/> 
+	</resultMap>
+
+	<select id="getArticleById" parameterType="string" resultMap="freeMap">
+		SELECT  F.FREE_ID
+				, F.EMAIL_ID
+				, F.FREE_SUBJECT
+				, F.FREE_CONTENT
+				, F.FREE_REAL_NAME
+				, F.FREE_RANDOM_NAME
+				, F.FREE_CREATED_DATE
+				, F.FREE_MODIFIED_DATE
+				, F.FREE_HIT
+				, F.FREE_PRODUCT_TYPE
+				, F.FREE_PRICE
+				, F.FREE_PRODUCT_NAME
+				, F.FREE_SIZE
+				, F.FREE_ETC
+				, F.FREE_ONSALE
+				, M.NICKNAME
+		FROM 	FREE_BOARD F, MEMBER M
+		WHERE 	F.EMAIL_ID = M.EMAIL_ID
+		AND		F.FREE_ID = #{freeId}
+	</select>
+	
+ 	<select id="getMainArticleList" parameterType="FreeVO" resultMap="freeMap">
+		SELECT  F.FREE_ID
+				, F.EMAIL_ID
+				, F.FREE_SUBJECT
+				, F.FREE_CONTENT
+				, F.FREE_CREATED_DATE
+				, F.FREE_REAL_NAME
+				, F.FREE_RANDOM_NAME
+				, F.FREE_HIT
+				, F.FREE_DEL_FLAG
+				, F.FREE_PRODUCT_TYPE
+				, F.FREE_PRICE
+				, F.FREE_PRODUCT_NAME
+				, F.FREE_SIZE
+				, F.FREE_ETC
+				, F.FREE_ONSALE
+				, M.NICKNAME
+		FROM 	FREE_BOARD F, MEMBER M
+		WHERE	F.EMAIL_ID = M.EMAIL_ID
+		AND		F.FREE_DEL_FLAG = 'N'
+		ORDER	BY F.FREE_ID DESC
+	</select> 
+	<select id="getAllArticleList" parameterType="FreeSearchVO" resultMap="freeMap">
+		SELECT FREE_ID
+				, EMAIL_ID
+				, FREE_SUBJECT
+				, FREE_CONTENT
+				, FREE_CREATED_DATE
+				, FREE_REAL_NAME
+				, FREE_RANDOM_NAME
+				, FREE_HIT
+				, FREE_DEL_FLAG
+				, FREE_PRODUCT_TYPE
+				, FREE_PRICE
+				, FREE_PRODUCT_NAME
+				, FREE_SIZE
+				, FREE_ETC
+				, FREE_ONSALE
+				, NICKNAME
+		FROM	(
+					SELECT	ROWNUM AS RNUM, A.*	
+					FROM	(
+								SELECT  F.FREE_ID
+										, F.EMAIL_ID
+										, F.FREE_SUBJECT
+										, F.FREE_CONTENT
+										, F.FREE_CREATED_DATE
+										, F.FREE_REAL_NAME
+										, F.FREE_RANDOM_NAME
+										, F.FREE_HIT
+										, F.FREE_DEL_FLAG
+										, F.FREE_PRODUCT_TYPE
+										, F.FREE_PRICE
+										, F.FREE_PRODUCT_NAME
+										, F.FREE_SIZE
+										, F.FREE_ETC
+										, F.FREE_ONSALE
+										, M.NICKNAME
+								FROM 	FREE_BOARD F, MEMBER M
+								WHERE	F.EMAIL_ID = M.EMAIL_ID
+								AND		F.FREE_DEL_FLAG = 'N'
+								
+								<if test="searchType == 'subject' and searchType != null and searchType != ''">
+								AND		F.FREE_SUBJECT LIKE '%' || #{searchKeyword} || '%'
+								</if>
+								<if test="searchType == 'nickName' and searchType != null and searchType != ''">
+								AND		M.NICKNAME LIKE '%' || #{searchKeyword} || '%'
+								</if>
+								<if test="searchType == 'productName' and searchType != null and searchType != ''">
+								AND		F.FREE_PRODUCT_NAME LIKE '%' || #{searchKeyword} || '%'
+								</if>
+								<if test="searchType == 'productType' and searchType != null and searchType != ''">
+								AND		F.FREE_PRODUCT_TYPE LIKE '%' || #{searchKeyword} || '%'
+								</if>
+								<if test="searchType == 'size' and searchType != null and searchType != ''">
+								AND		F.FREE_SIZE LIKE '%' || #{searchKeyword} || '%'
+								</if>
+								<if test="searchType == 'etc' and searchType != null and searchType != ''">
+								AND		F.FREE_ETC LIKE '%' || #{searchKeyword} || '%'
+								</if>
+								ORDER	BY F.FREE_ID DESC
+							) A
+					WHERE	ROWNUM <![CDATA[<=]]> #{paging.endArticleNumber}
+				)
+		WHERE	RNUM >= #{paging.startArticleNumber}
+	</select>
+	
+	
+ 	<select id="getArticleCount" parameterType="FreeSearchVO" resultType="_int">
+		SELECT  COUNT(*)
+		FROM	FREE_BOARD F
+				, MEMBER M
+		WHERE	F.EMAIL_ID = M.EMAIL_ID
+		AND		M.DELETE_FLAG = 'N'
+		<if test="subject != null and subject != ''">
+		AND		F.FREE_SUBJECT LIKE '%' || #{subject} || '%'
+		</if>
+		<if test="nickName != null and nickName != ''">
+		AND		M.NICKNAME LIKE '%' || #{nickName} || '%'
+		</if>
+		<if test="productName != null and productName != ''">
+		AND		F.FREE_PRODUCT_NAME LIKE '%' || #{productName} || '%'
+		</if>
+		<if test="productType != null and productType != ''">
+		AND		F.FREE_PRODUCT_TYPE LIKE '%' || #{productType} || '%'
+		</if>
+		<if test="size != null and size != ''">
+		AND		F.FREE_SIZE LIKE '%' || #{size} || '%'
+		</if>
+		<if test="etc != null and etc != ''">
+		AND		F.FREE_ETC LIKE '%' || #{etc} || '%'
+		</if>
+	</select>
+
+
+
+	<update id="updateArticle" parameterType="FreeVO">
+		UPDATE	FREE_BOARD
+		SET		
+				FREE_SUBJECT = #{subject}
+				, FREE_CONTENT = #{content} 
+				<if test="realName != null || realName != '' ">
+				, FREE_REAL_NAME = #{realName}
+				</if>
+				<if test="randomName != null || randomName != '' ">
+   				, FREE_RANDOM_NAME = #{randomName}
+				</if> 
+   				, FREE_MODIFIED_DATE = SYSDATE
+   				, FREE_PRODUCT_TYPE = #{productType}
+   				, FREE_PRICE = #{productPrice}
+   				, FREE_PRODUCT_NAME = #{productName}
+   				, FREE_SIZE = #{size}
+   				, FREE_ETC = #{etc}
+		WHERE	FREE_ID = #{freeId}
+	</update>
+	
+	<update 	id="deleteArticle" parameterType="FreeVO">
+		UPDATE	FREE_BOARD
+		SET		FREE_DEL_FLAG = 'Y'
+		WHERE	FREE_ID = #{freeId}
+	</update>
+	
+	<update 	id="soldOut" parameterType="FreeVO">
+		UPDATE	FREE_BOARD
+		SET		FREE_ONSALE = '판매완료'
+		WHERE	FREE_ID = #{freeId}
+	</update>
+	
+	<update	id="updateHitCount" parameterType="FreeVO">
+		UPDATE 	FREE_BOARD 
+		SET		FREE_HIT = FREE_HIT + 1 
+		WHERE 	FREE_ID = #{freeId} 
+	</update>
+</mapper>
+	

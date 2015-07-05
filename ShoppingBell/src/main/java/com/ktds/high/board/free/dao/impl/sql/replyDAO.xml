@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+				"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+				
+<mapper namespace="replyDAO">
+	<insert		id="write" parameterType="FreeReplyVO">
+		INSERT INTO FREE_BOARD_RPLY (
+   					FREE_RPLY_ID
+   					, FREE_ID
+   					, EMAIL_ID
+   					, FREE_RPLY_CONTENT
+   					, FREE_RPLY_CREATED_DATE
+   					, FREE_RPLY_MODIFIED_DATE
+   					, FREE_RPLY_DEL_FLAG
+   					) 
+		VALUES ( 
+					'FRRP-' || TO_CHAR(SYSDATE, 'YYYYMMDDHH24') || '-' || LPAD(FREE_REPLY_ID_SEQ.NEXTVAL, 6, 0)
+					, #{freeId}
+					, #{emailId}
+					, #{content}
+					, SYSDATE
+					, SYSDATE
+					, 'N'
+				)
+	</insert>
+	
+	<resultMap type="FreeReplyVO" id="getRepliesMap">
+		<id 	property="replyId" 		column="FREE_RPLY_ID"/>
+		<result property="freeId" 	column="FREE_ID"/>
+		<result property="emailId" 	column="EMAIL_ID"/>
+		<result property="nickName" 	column="NICKNAME"/>
+		<result property="content" 		column="FREE_RPLY_CONTENT"/>
+		<result property="createdDate" 	column="FREE_RPLY_CREATED_DATE"/>
+		<result property="modifiedDate" column="FREE_RPLY_MODIFIED_DATE"/>
+	</resultMap>
+	
+	<select		id="getReplies"	
+				parameterType="string"
+				resultMap="getRepliesMap">
+		SELECT	F.FREE_RPLY_ID
+				, F.FREE_ID
+				, F.EMAIL_ID
+				, M.NICKNAME
+				, F.FREE_RPLY_CONTENT
+				, F.FREE_RPLY_CREATED_DATE
+				, F.FREE_RPLY_MODIFIED_DATE
+		FROM 	FREE_BOARD_RPLY F
+				, MEMBER M
+		WHERE	F.EMAIL_ID = M.EMAIL_ID
+		AND		F.FREE_ID = #{freeId}
+		AND		F.FREE_RPLY_DEL_FLAG = 'N'
+		ORDER	BY F.FREE_RPLY_ID ASC
+	</select>
+	
+	 <select		id="getReply"	
+				parameterType="FreeReplyVO"
+				resultMap="getRepliesMap">
+		SELECT	F.FREE_RPLY_ID
+				, F.FREE_ID
+				, F.EMAIL_ID
+				, M.NICKNAME
+				, F.FREE_RPLY_CONTENT
+				, F.FREE_RPLY_CREATED_DATE
+				, F.FREE_RPLY_MODIFIED_DATE
+		FROM 	FREE_BOARD_RPLY F
+				, MEMBER M
+		WHERE	F.EMAIL_ID = M.EMAIL_ID
+		AND		F.FREE_ID = #{freeId}
+		AND		F.FREE_RPLY_ID = #{replyId}
+	</select>
+	
+	<select		id="getReplyCount"	
+				parameterType="string"
+				resultType="string">
+		SELECT	COUNT(1)
+		FROM 	FREE_BOARD_RPLY
+		WHERE	FREE_ID = #{freeId}
+	</select>
+
+	<update		id="modify"
+				parameterType="FreeReplyVO">
+		UPDATE	FREE_BOARD_RPLY
+		SET		FREE_RPLY_CONTENT = #{content}
+				, FREE_RPLY_MODIFIED_DATE = SYSDATE
+		WHERE	FREE_RPLY_ID = #{replyId}
+	</update>
+	
+	<update		id="delete"
+				parameterType="FreeReplyVO">
+		UPDATE	FREE_BOARD_RPLY
+		SET		FREE_RPLY_DEL_FLAG = 'Y'
+		 WHERE	FREE_RPLY_ID = #{replyId}
+
+	</update>
+</mapper>
+
+
+
+
+
+
+

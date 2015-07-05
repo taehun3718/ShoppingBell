@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="shoppingBell.board.hotdealDAO" class="com.ktds.high.board.hotdeal.dao.impl.HotdealDAOImpl">
+		<property name="sqlSessionTemplate" ref="sqlSessionTemplate" />
+	</bean>
+
+	<bean id="shoppingBell.board.hotdealBiz" class="com.ktds.high.board.hotdeal.biz.impl.HotdealBizImpl">
+		<property name="hotdealDAO" ref="shoppingBell.board.hotdealDAO" />
+	</bean>
+
+	<bean id="shoppingBell.board.hotdealService" class="com.ktds.high.board.hotdeal.service.impl.HotdealServiceImpl">
+		<property name="hotdealBiz" ref="shoppingBell.board.hotdealBiz" />
+	</bean>
+
+</beans>

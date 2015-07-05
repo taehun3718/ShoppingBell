@@ -1,0 +1,281 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+				"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="postDAO">
+
+	<select id="getPostingId" resultType="string">
+		SELECT	'PST-' || TO_CHAR(SYSDATE,'YYYYMMDDHH24') || '_' || LPAD(POST_ID_SEQ.NEXTVAL, 6, 0)
+		FROM	DUAL
+	</select>
+
+	<!--write MultiPost -->
+	<insert id="writeMultiPost" parameterType="map">
+		INSERT INTO POSTING_BOARD (
+			POSTING_ID
+			, POSTING_SUBJECT
+			, POSTING_CONTENT
+			, EMAIL_ID
+			, POSTING_LIKE
+			, POSTING_REAL_NAME
+			, POSTING_RANDOM_NAME
+			, POSTING_CREATED_DATE
+			, POSTING_MODIFIED_DATE
+			, POSTING_CATEGORY
+			)
+			VALUES ( #{postingId}
+			, #{subject}
+			, #{content}
+			, #{emailId}
+			, #{postingLike}
+			, #{realName}
+			, #{randomName}
+			, SYSDATE
+			, SYSDATE
+			, ${category}
+		)
+	</insert>
+
+	<!--Read for post. referenced by www.vingle.net -->
+	<resultMap type="PostVO" id="postListMap">
+
+		<result property="postingId" column="POSTING_ID" />
+		<result property="emailId" column="EMAIL_ID" />
+		<result property="subject" column="POSTING_SUBJECT" />
+		<result property="content" column="POSTING_CONTENT" />
+		<result property="postingLike" column="POSTING_LIKE" />
+		<result property="modifiedDate" column="POSTING_MODIFIED_DATE" />
+		<result property="numOfReply" column="POSTING_RPLY_CNT" />
+		<result property="randomName" column="POSTING_RANDOM_NAME" />
+		<result property="hit" column="POSTING_HIT" />
+	</resultMap>
+
+
+	<select id="postList" parameterType="PostSearchVO" resultMap="postListMap">
+		SELECT	POSTING_ID
+			, EMAIL_ID
+			, POSTING_SUBJECT
+			, POSTING_CONTENT
+			, POSTING_LIKE
+			, TO_CHAR(POSTING_MODIFIED_DATE, 'MM-DD') POSTING_MODIFIED_DATE
+			, ( 
+					SELECT	COUNT(*) 
+					FROM	POSTING_BOARD_RPLY RP
+					WHERE	RP.POSTING_ID = P.POSTING_ID
+   			) POSTING_RPLY_CNT 
+   			, POSTING_RANDOM_NAME
+   			, POSTING_HIT
+		FROM	POSTING_BOARD P
+		WHERE	POSTING_DEL_FLAG = 'N'
+		<if test="searchKeyword != null">
+			<if test="searchKeyword != '' ">
+				AND POSTING_SUBJECT LIKE  '%' || #{searchKeyword} || '%'
+			</if>
+			<if test="category != 0">
+				AND POSTING_CATEGORY = #{category}
+			</if>
+		</if>
+		ORDER	BY POSTING_ID DESC
+	</select>
+
+	<!--Read detail post by Id. referenced by www.vingle.net -->
+	<resultMap type="PostVO" id="postDetailByIdByMap">
+		<result property="postingId" 	column="POSTING_ID" />
+		<result property="subject" 		column="POSTING_SUBJECT" />
+		<result property="realName" 	column="POSTING_REAL_NAME" />
+		<result property="randomName"	column="POSTING_RANDOM_NAME" />
+		<result property="content" 		column="POSTING_CONTENT" />
+		<result property="postingLike" 	column="POSTING_LIKE" />
+		<result property="emailId" 		column="EMAIL_ID" />
+		<result property="modifiedDate" column="POSTING_MODIFIED_DATE" />
+		<result property="hit" 			column="POSTING_HIT" />
+		<result property="category" 	column="POSTING_CATEGORY" />
+	</resultMap>
+
+	<select id="postDetailById" parameterType="string" resultMap="postDetailByIdByMap">
+		SELECT POSTING_ID
+		, POSTING_REAL_NAME
+		, POSTING_RANDOM_NAME
+		, POSTING_SUBJECT
+		, POSTING_CONTENT
+		, POSTING_LIKE
+		, EMAIL_ID
+		, POSTING_MODIFIED_DATE
+		, POSTING_HIT
+		, POSTING_CATEGORY
+		FROM POSTING_BOARD
+		WHERE POSTING_ID = #{postId}
+		AND POSTING_DEL_FLAG = 'N'
+	</select>
+
+	<!--Update post by Id. referenced by www.vingle.net -->
+	<update id="updatePost" parameterType="PostVO">
+		UPDATE POSTING_BOARD
+		SET
+		POSTING_MODIFIED_DATE = SYSDATE
+		,
+		POSTING_SUBJECT = #{subject}
+		, POSTING_CONTENT = #{content}
+		<if test="realName != null">
+			, POSTING_REAL_NAME = #{realName }
+		</if>
+		<if test="randomName != null">
+			, POSTING_RANDOM_NAME= #{randomName }
+		</if>
+
+		WHERE POSTING_ID = #{postingId}
+	</update>
+	<!--Update updateMultiPost by Id. referenced by www.vingle.net -->
+	<update id="updateMultiPost" parameterType="map">
+		UPDATE POSTING_BOARD
+		SET
+			POSTING_MODIFIED_DATE = SYSDATE
+		, POSTING_SUBJECT = #{subject}
+		, POSTING_CONTENT = #{content}
+		<if test="realName != null">
+			, POSTING_REAL_NAME = #{realName }
+		</if>
+		<if test="randomName != null">
+			, POSTING_RANDOM_NAME= #{randomName }
+		</if>
+		, POSTING_CATEGORY = #{category}
+		WHERE POSTING_ID = #{postingId}
+	</update>
+
+	<!--Update delete flag 'Y' post by Id. referenced by www.vingle.net -->
+
+	<update id="updateDeleteFlagPost" parameterType="PostVO">
+		UPDATE
+		POSTING_BOARD
+		SET
+		POSTING_DEL_FLAG = 'Y'
+		, POSTING_MODIFIED_DATE =
+		SYSDATE
+
+		WHERE POSTING_ID = #{postingId}
+	</update>
+
+	<!--write postReply -->
+	<insert id="writePostReply" parameterType="PostReplyVO">
+		INSERT INTO
+		POSTING_BOARD_RPLY (
+		POSTING_RPLY_ID
+		, POSTING_ID
+		, EMAIL_ID
+		, POSTING_RPLY_CONTENT
+		, POSTING_RPLY_CREATED_DATE
+		, POSTING_RPLY_MODIFIED_DATE)
+		VALUES ( 'POST-RPLY-' || TO_CHAR(SYSDATE,
+		'YYYYMMDDHH24') || '-' ||
+		LPAD(POST_ID_SEQ.NEXTVAL, 6, 0)
+		, #{postingId}
+		, #{emailId}
+		, #{postingReplyContent}
+		, SYSDATE
+		, SYSDATE
+		)
+	</insert>
+
+	<!--Read for postReplyList -->
+	<resultMap type="PostReplyVO" id="postReplyListMap">
+
+		<result property="postingReplyId"			column="POSTING_RPLY_ID" />
+		<result property="postingId" 				column="POSTING_ID" />
+		<result property="emailId" 					column="EMAIL_ID" />
+		<result property="postingReplyContent" 		column="POSTING_RPLY_CONTENT" />
+		<result property="postingReplyCreatedDate" 	column="POSTING_RPLY_CREATED_DATE" />
+		<result property="postingReplyModifiedDate" column="POSTING_RPLY_MODIFIED_DATE" />
+		<result property="nickName" 				column="NICKNAME" />
+
+	</resultMap>
+
+	<select id="postReplyList" parameterType="string" resultMap="postReplyListMap">
+		SELECT	POSTING_RPLY_ID
+				, POSTING_ID
+				, NICKNAME
+				, POSTING_RPLY_CONTENT
+				, POSTING_RPLY_CREATED_DATE
+				, POSTING_RPLY_MODIFIED_DATE
+				, POSTING_RPLY_DEL_FLAG
+				, P.EMAIL_ID
+		FROM	POSTING_BOARD_RPLY P, MEMBER M
+		WHERE	P.EMAIL_ID = M.EMAIL_ID
+		AND		POSTING_RPLY_DEL_FLAG = 'N'
+		AND		POSTING_ID = #{postId }
+		ORDER	BY	POSTING_RPLY_ID ASC
+</select>
+
+	<!--Update postReply by Id. -->
+	<update id="updatePostReplyById" parameterType="PostReplyVO">
+		UPDATE	POSTING_BOARD_RPLY
+		SET
+			POSTING_RPLY_CONTENT = #{postingReplyContent }
+		WHERE	POSTING_RPLY_ID = #{postingReplyId }
+		AND		POSTING_RPLY_DEL_FLAG = 'N'
+	</update>
+	
+	<!--Update postReply by Id. -->
+	<update id="updatePostReplyDeleteFlagById" parameterType="PostReplyVO">
+		UPDATE	POSTING_BOARD_RPLY
+		SET
+				POSTING_RPLY_DEL_FLAG = 'Y'
+		WHERE	POSTING_RPLY_ID = #{postingReplyId }
+	</update>
+	
+	
+	<!--Select Like  -->
+	<resultMap id="selectLikeMap" type="LikeVO" >
+		<result property="brdId"	column="BRD_ID" />
+		<result property="emailId" 	column="EMAIL_ID" />
+	</resultMap>
+	
+	<select id="selectLike" parameterType="map" resultMap="selectLikeMap">
+		SELECT	BRD_ID, EMAIL_ID
+		FROM 	LIKE_MEMBER
+		WHERE	BRD_ID		= #{brdId}
+		AND		EMAIL_ID	= #{emailId}
+	</select>
+	
+	<!-- Insert like boardId and emailId  -->
+	<insert id="insertLike" parameterType="map">
+		INSERT INTO LIKE_MEMBER (
+			BRD_ID
+			, EMAIL_ID
+		)
+		VALUES ( #{brdId}
+			, #{emailId}
+		)
+	</insert>
+	
+	<!-- delete like boardId and emailId  -->
+	<delete id="deleteLike" parameterType="map">
+		DELETE	FROM	LIKE_MEMBER 
+		WHERE	BRD_ID = #{brdId}
+		AND		EMAIL_ID=#{emailId}
+	</delete>
+	
+	<!--Update post like count  -->
+	<update id="updatePostLikeById" parameterType="PostVO">
+	UPDATE	POSTING_BOARD
+		SET
+		POSTING_LIKE = POSTING_LIKE + 1
+	WHERE	POSTING_ID = #{postingId }
+	</update>
+	
+	<!--Update post like count  -->
+	<update id="updatePostLikeMinusById" parameterType="PostVO">
+	UPDATE	POSTING_BOARD
+		SET
+		POSTING_LIKE = POSTING_LIKE -1
+	WHERE	POSTING_ID = #{postingId }
+	</update>
+	
+	<!-- Update post hit count  -->
+	<update id="updatePostHit" parameterType="string">
+	UPDATE	POSTING_BOARD
+		SET
+		POSTING_HIT = POSTING_HIT +1
+	WHERE	POSTING_ID = #{postingId }
+	</update>
+	
+</mapper>
